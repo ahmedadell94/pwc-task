@@ -46,6 +46,9 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Create kube config directory
+        run: mkdir -p $HOME/.kube
+
       # Configure kubeconfig from secret
       - name: Set kubeconfig
         run: |
