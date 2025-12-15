@@ -68,7 +68,7 @@ jobs:
           fi
           IMAGE_NAME=${{ secrets.ACR_NAME }}.azurecr.io/pwc-python:$IMAGE_TAG
           cd $DEPLOYMENT_DIR
-          kustomize edit set image pwc-python=$IMAGE_NAME
+          kustomize edit set image pwcacr.azurecr.io/pwc-python=$IMAGE_NAME
           kubectl apply -k .
 
           # Wait for deployment rollout

@@ -3,9 +3,6 @@ bases:
   - ../../base
 resources:
   - namespace.yaml
-images:
-  - name: pwcacr.azurecr.io/pwc-python
-    newTag: latest
 
 replicas:
   - name: python-microservice
