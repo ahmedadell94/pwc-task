@@ -64,6 +64,7 @@ jobs:
         run: |
           if [ "${GITHUB_REF_NAME}" == "main" ]; then
             DEPLOYMENT_DIR=k8s/overlays/prod
+            NAMESPACE=prod
           fi
           IMAGE_NAME=${{ secrets.ACR_NAME }}.azurecr.io/pwc-python:$IMAGE_TAG
           cd $DEPLOYMENT_DIR
@@ -71,8 +72,8 @@ jobs:
           kubectl apply -k .
 
           # Wait for deployment rollout
-          if ! kubectl rollout status deployment/python-microservice --timeout=120s; then
+          if ! kubectl rollout status deployment/python-microservice -n $NAMESPACE --timeout=120s; then
             echo "Rollout failed. Rolling back..."
-            kubectl rollout undo deployment/python-microservice
+            kubectl rollout undo deployment/python-microservice -n $NAMESPACE
             exit 1
           fi

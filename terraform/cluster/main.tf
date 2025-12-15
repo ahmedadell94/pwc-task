@@ -5,6 +5,18 @@ data "terraform_remote_state" "core" {
   }
 }
 
+data "terraform_remote_state" "registry" {
+  backend = "local"
+  config = {
+    path = "../registry/terraform.tfstate"
+  }
+}
+
+data "azurerm_container_registry" "acr" {
+  name                = data.terraform_remote_state.registry.outputs.acr_name
+  resource_group_name = data.terraform_remote_state.core.outputs.rg_name
+}
+
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "pwc-aks"
   location            = data.terraform_remote_state.core.outputs.rg_location
@@ -24,4 +36,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+resource "azurerm_role_assignment" "aks_acr_pull" {
+  scope                = data.azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
