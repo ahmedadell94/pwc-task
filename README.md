@@ -109,5 +109,5 @@ Deploy the **cluster** first. Terraform instructions are in `terraform/README.md
 kubectl get svc -n prod python-microservice \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}'
 ```
-- Open Grafana in your browser
+- Open App in your browser
     Use the EXTERNAL-IP (e.g., http://48.194.98.60) in a web browser.
