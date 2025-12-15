@@ -28,19 +28,16 @@ jobs:
           fi
           echo "Using image tag: $IMAGE_TAG"
 
-      # Login to ACR with username & password
       - name: Login to ACR
         run: |
           echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_NAME }}.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
 
-      # Build and push Docker image
       - name: Build and Push Image
         run: |
           IMAGE_NAME=${{ secrets.ACR_NAME }}.azurecr.io/pwc-python:$IMAGE_TAG
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
-      # Set up kubectl
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -49,17 +46,32 @@ jobs:
       - name: Create kube config directory
         run: mkdir -p $HOME/.kube
 
-      # Configure kubeconfig from secret
       - name: Set kubeconfig
         run: |
           echo "${{ secrets.KUBECONFIG_CONTENT }}" > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # Deploy to AKS with rollout check
+      - name: Install Kustomize if not present
+        run: |
+          if ! command -v kustomize &> /dev/null; then
+            echo "Kustomize not found. Installing..."
+            sudo snap install kustomize
+          else
+            echo "Kustomize already installed."
+          fi
+
       - name: Deploy to AKS
         run: |
-          DEPLOYMENT_NAME=python-microservice
+          if [ "${GITHUB_REF_NAME}" == "main" ]; then
+            DEPLOYMENT_DIR=k8s/overlays/prod
+          fi
           IMAGE_NAME=${{ secrets.ACR_NAME }}.azurecr.io/pwc-python:$IMAGE_TAG
-          kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME=$IMAGE_NAME --record
-          kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=60s || \
-          (echo "Rollout failed. Rolling back..." && kubectl rollout undo deployment/$DEPLOYMENT_NAME && exit 1)
+          kustomize edit set image python-microservice=$IMAGE_NAME
+          kustomize build $DEPLOYMENT_DIR | kubectl apply -f -
+
+          # Wait for deployment rollout
+          if ! kubectl rollout status deployment/python-microservice --timeout=120s; then
+            echo "Rollout failed. Rolling back..."
+            kubectl rollout undo deployment/python-microservice
+            exit 1
+          fi
