@@ -9,7 +9,7 @@ on:
       - 'Dockerfile'
       - 'requirements.txt'
       - 'k8s/**'
-      - '.github/workflows/pipeline.yml'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 jobs:
