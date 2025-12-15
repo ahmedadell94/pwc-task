@@ -66,8 +66,9 @@ jobs:
             DEPLOYMENT_DIR=k8s/overlays/prod
           fi
           IMAGE_NAME=${{ secrets.ACR_NAME }}.azurecr.io/pwc-python:$IMAGE_TAG
+          cd $DEPLOYMENT_DIR
           kustomize edit set image python-microservice=$IMAGE_NAME
-          kustomize build $DEPLOYMENT_DIR | kubectl apply -f -
+          kubectl apply -k .
 
           # Wait for deployment rollout
           if ! kubectl rollout status deployment/python-microservice --timeout=120s; then
