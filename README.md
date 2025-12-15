@@ -76,10 +76,10 @@ Add the following **GitHub Secrets** for the pipeline to work:
 
 | Secret Name            | Description | Example / Notes |
 |------------------------|-------------|----------------|
-| `ACR_NAME`             | Azure Container Registry name | `pwcregistry` |
+| `ACR_NAME`             | Azure Container Registry name | `pwcacr` |
 | `ACR_USERNAME`         | Username to access ACR | `pwcacr` |
-| `ACR_PASSWORD`         | Password / Access Key for ACR | `abc123XYZ...` |
-| `KUBECONFIG_CONTENT`   | Full kubeconfig content for AKS cluster | Content of `~/.kube/config` for the cluster |
+| `ACR_PASSWORD`         | Password / Access Key for ACR | `7VOnB...` |
+| `KUBECONFIG_CONTENT`   | Full kubeconfig content for AKS cluster | Content of `~/.kube/config` for the cluster or ` az aks get-credentials --resource-group pwc-rg --name pwc-aks --file - ` |
 | `AKS_RG`               | Resource group of AKS cluster | `pwc-rg` |
 | `AKS_NAME`             | AKS cluster name | `pwc-aks` |
 
