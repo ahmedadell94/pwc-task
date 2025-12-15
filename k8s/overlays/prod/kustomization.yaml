@@ -1,0 +1,12 @@
+namespace: prod
+bases:
+  - ../../base
+
+images:
+  - name: pwcacr.azurecr.io/pwc-python
+    newTag: latest
+
+replicas:
+  - name: python-microservice
+    count: 1
+
