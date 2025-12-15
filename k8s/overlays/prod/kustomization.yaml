@@ -1,7 +1,8 @@
 namespace: prod
 bases:
   - ../../base
-
+resources:
+  - namespace.yaml
 images:
   - name: pwcacr.azurecr.io/pwc-python
     newTag: latest
